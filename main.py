@@ -5,7 +5,7 @@ from hashlib import sha256
 
 from os import listdir, path
 from sys import argv
-from typing import Optional, List
+from typing import Optional, List, Dict
 
 __version__: str = "1.0"
 __author__: str = "Yohann Boniface"
@@ -39,12 +39,18 @@ class Main:
 
         self.all_hash: List[str] = self.get_content(all_hash)
         self.dictionary: List[str] = self.get_content(dictionary)
+
+        if self.all_hash is None or self.dictionary is None:
+            print("File or Directory not found !", self)
+            return
+
         print(' results '.center(32, '-'))
 
-        (
+        if len(self.all_hash) != 1:
             self.multiple(self.all_hash)
-            if len(self.all_hash) != 1 else self.single(self.all_hash[0])
-        )
+
+        else:
+            self.single(self.all_hash[0])
 
         input("Press enter key to quit...")
 
@@ -61,10 +67,8 @@ class Main:
     def get_hash(string) -> str:
         return sha256(string.encode()).hexdigest()
 
-    def single(self, _hash: str):
+    def single(self, _hash: str) -> None:
         """If only one hash is provided, scroll within the directory."""
-
-        val: str
         for val in self.dictionary:
             if self.get_hash(val) == _hash:
                 self.log(f"Found matching hash for {val} ({_hash})")
@@ -72,53 +76,53 @@ class Main:
         else:
             self.log("<!> No hash found")
 
-    def multiple(self, _hash_list: List[str]):
+    def multiple(self, _hash_list: List[str]) -> None:
         """When hash file contains multiple lines or multiple files are given.
 
         An hash dictionary is built which is way faster than a multiple
         for loop but ask lots of memory."""
-        self.dictionary: dict[str:str] = {
+        self.dictionary: Dict[str, str] = {
             self.get_hash(val): val for val in self.dictionary
         }
 
-        _hash: str
         for _hash in _hash_list:
             val: Optional[str] = self.dictionary.get(_hash)
+
             self.log(
                 "<!> No hash found"
                 if val is None else f"Found matching hash for {val} ({_hash})"
             )
 
     @staticmethod
-    def log(string: str):
+    def log(string: str) -> None:
         """ print with an time marker """
         print(f"[{perf_counter():,.3f}s] {string}")
 
-    def get_content(self, _path: str) -> List[str]:
+    @staticmethod
+    def get_content(_path: str) -> Optional[List[str]]:
         """.Get all values from path and merge file if a directory is given."""
         if path.isfile(_path):
             print(f"Opening file: {_path}")
+
             with open(_path) as f:
                 return f.read().splitlines()
 
-        elif path.isdir(_path):
-            files: List[List[str]] = []
-            print(f"Opening folder: {_path}")
+        if not path.isdir(_path):
+            return
 
-            filename: str
-            for filename in listdir(_path):
-                if not filename.endswith('.txt'):
-                    continue
+        files: List[List[str]] = []
+        print(f"Opening folder: {_path}")
 
-                print(f"+ {filename}")
+        for filename in listdir(_path):
+            if not filename.endswith('.txt'):
+                continue
 
-                with open(f"{_path}/{filename}") as f:
-                    files.append(f.read().splitlines())
+            print(f"+ {filename}")
 
-            return [line for file in files for line in file]
+            with open(f"{_path}/{filename}") as f:
+                files.append(f.read().splitlines())
 
-        print("File or Directory not found !", self)
-        quit()
+        return [line for file in files for line in file]
 
 
 if __name__ == '__main__':
