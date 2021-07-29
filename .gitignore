@@ -1,0 +1,9 @@
+# Pycharm Configuration Files
+.idea
+
+# Python
+__pycache__
+venv
+
+# Old
+archive
