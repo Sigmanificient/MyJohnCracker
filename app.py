@@ -32,6 +32,7 @@ class App:
 
         if overflow or '--help' in argv:
             print(self)
+            os.system("pause")
             return
 
         self.all_hash: List[str] = self.get_content(all_hash)
