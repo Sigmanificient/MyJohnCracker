@@ -1,0 +1,5 @@
+columns = 80
+sort = "lines"
+types = ["Python", "CSharp"]
+treat_doc_strings_as_comments = true
+exclude="*.txt"
