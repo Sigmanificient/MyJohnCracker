@@ -1,4 +1,12 @@
-"""An python script to compare multiple hash with a dictionary of word."""
+"""
+An python script to compare multiple hash with a dictionary of word.
+
+:argument:
+--help			Show this helpful message
+
+:param[1]:		Hash path,	default: [assets/hash]
+:param[2]:		Dictionary	path, default: [assets/dict]
+"""
 
 from time import perf_counter
 from hashlib import sha256
@@ -12,19 +20,6 @@ __author__: str = "Yohann Boniface"
 
 
 class Main:
-    """
-       ______  ______      ____              __
-      / ____ \\/ ____/_  __/ / /_  ___  _____/ /_
-     / / __ `/ /_  / / / / / __ \\/ _ \\/ ___/ __/
-    / / /_/ / __/ / /_/ / / /_/ /  __/ /  / /_
-    \\ \\__,_/_/    \\__,_/_/_.___/\\___/_/   \\__/
-     \\____/ __           __        ___                  __
-       / / / /___ ______/ /__     /   | _________ _____/ /__  ____ ___  __  __
-      / /_/ / __ `/ ___/ //_/    / /| |/ ___/ __ `/ __  / _ \\/ __ `__ \\/ / / /
-     / __  / /_/ / /__/ ,<      / ___ / /__/ /_/ / /_/ /  __/ / / / / / /_/ /
-    /_/ /_/\\__,_/\\___/_/|_|    /_/  |_\\___/\\__,_/\\__,_/\\___/_/ /_/ /_/\\__
-                                                                     /____/
-    """
 
     def __init__(
         self,
@@ -32,7 +27,8 @@ class Main:
         dictionary: str = "assets/dict",
         *overflow: str
     ):
-        print(self.__doc__)
+        print_ascii_art()
+
         if overflow or '--help' in argv:
             print(self)
             return
@@ -77,7 +73,8 @@ class Main:
             self.log("<!> No hash found")
 
     def multiple(self, _hash_list: List[str]) -> None:
-        """When hash file contains multiple lines or multiple files are given.
+        """When hash file contains multiple lines
+            or multiple files are given.
 
         An hash dictionary is built which is way faster than a multiple
         for loop but ask lots of memory."""
@@ -100,7 +97,8 @@ class Main:
 
     @staticmethod
     def get_content(_path: str) -> Optional[List[str]]:
-        """.Get all values from path and merge file if a directory is given."""
+        """Get all values from path and merge file if a directory is
+            given."""
         if path.isfile(_path):
             print(f"Opening file: {_path}")
 
@@ -123,6 +121,11 @@ class Main:
                 files.append(f.read().splitlines())
 
         return [line for file in files for line in file]
+
+
+def print_ascii_art():
+    with open('assets/asciiart/asciiart.txt') as f:
+        print(f.read())
 
 
 if __name__ == '__main__':
