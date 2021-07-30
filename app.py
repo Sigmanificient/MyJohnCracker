@@ -7,7 +7,7 @@ An python script to compare multiple hash with a dictionary of word.
 :param[1]:		Hash path,	default: [assets/hash]
 :param[2]:		Dictionary	path, default: [assets/dict]
 """
-
+import os
 from time import perf_counter
 from hashlib import sha256
 
@@ -19,7 +19,7 @@ __version__: str = "1.0"
 __author__: str = "Yohann Boniface"
 
 
-class Main:
+class App:
 
     def __init__(
         self,
@@ -27,6 +27,7 @@ class Main:
         dictionary: str = "assets/dict",
         *overflow: str
     ):
+        """Initialize the application with given sys argy."""
         print_ascii_art()
 
         if overflow or '--help' in argv:
@@ -41,17 +42,10 @@ class Main:
             return
 
         print(' results '.center(32, '-'))
-
-        if len(self.all_hash) != 1:
-            self.multiple(self.all_hash)
-
-        else:
-            self.single(self.all_hash[0])
-
-        input("Press enter key to quit...")
+        self.run()
 
     def __repr__(self):
-        """ Representation give an help message """
+        """Representation give the help message."""
         return '\n'.join((
             "archive - This is the help message.",
             "--help\t\t\tShow this helpful message", '',
@@ -59,12 +53,18 @@ class Main:
             "@param[2]:\t\tDictionary\tpath, default: [assets/dict]"
         ))
 
-    @staticmethod
-    def get_hash(string) -> str:
-        return sha256(string.encode()).hexdigest()
+    def run(self):
+        """Start the hash brute force process."""
+        if len(self.all_hash) != 1:
+            self.multiple(self.all_hash)
+
+        else:
+            self.single(self.all_hash[0])
+
+        os.system("pause")
 
     def single(self, _hash: str) -> None:
-        """If only one hash is provided, scroll within the directory."""
+        """Scroll within the dictionary until a hash matches."""
         for val in self.dictionary:
             if self.get_hash(val) == _hash:
                 self.log(f"Found matching hash for {val} ({_hash})")
@@ -73,11 +73,8 @@ class Main:
             self.log("<!> No hash found")
 
     def multiple(self, _hash_list: List[str]) -> None:
-        """When hash file contains multiple lines
-            or multiple files are given.
+        """Build a hash dictionary or proceed multiple hash lookup."""
 
-        An hash dictionary is built which is way faster than a multiple
-        for loop but ask lots of memory."""
         self.dictionary: Dict[str, str] = {
             self.get_hash(val): val for val in self.dictionary
         }
@@ -90,24 +87,35 @@ class Main:
                 if val is None else f"Found matching hash for {val} ({_hash})"
             )
 
+    def get_content(self, _path: str) -> Optional[List[str]]:
+        """Get the files contents of a given file or directory."""
+        if path.isfile(_path):
+            return self.read_single_file(_path)
+
+        if path.isdir(_path):
+            return self.read_folder_files(_path)
+
+    @staticmethod
+    def get_hash(string) -> str:
+        """Return the sh256 hash of a string."""
+        return sha256(string.encode()).hexdigest()
+
     @staticmethod
     def log(string: str) -> None:
-        """ print with an time marker """
+        """Prints a formatted log with a time marker."""
         print(f"[{perf_counter():,.3f}s] {string}")
 
     @staticmethod
-    def get_content(_path: str) -> Optional[List[str]]:
-        """Get all values from path and merge file if a directory is
-            given."""
-        if path.isfile(_path):
-            print(f"Opening file: {_path}")
+    def read_single_file(_path: str) -> List[str]:
+        """Read lines from a given file path."""
+        print(f"Opening file: {_path}")
 
-            with open(_path) as f:
-                return f.read().splitlines()
+        with open(_path) as f:
+            return f.read().splitlines()
 
-        if not path.isdir(_path):
-            return
-
+    @staticmethod
+    def read_folder_files(_path: str) -> List[str]:
+        """Read multiple files from a folder and merge there lines."""
         files: List[List[str]] = []
         print(f"Opening folder: {_path}")
 
@@ -123,10 +131,11 @@ class Main:
         return [line for file in files for line in file]
 
 
-def print_ascii_art():
+def print_ascii_art() -> None:
+    """Prints the school ascci art in the console."""
     with open('assets/asciiart/asciiart.txt') as f:
         print(f.read())
 
 
 if __name__ == '__main__':
-    Main(*argv[1:])
+    App(*argv[1:])
