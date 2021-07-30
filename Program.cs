@@ -55,7 +55,9 @@ namespace MyJohnCracker
 
             // Loop through each byte of the hashed data
             // and format each one as a hexadecimal string.
-            foreach (var t in data) sBuilder.Append(t.ToString("x2"));
+            foreach (var t in data) {
+                sBuilder.Append(t.ToString("x2"))
+            };
 
             // Return the hexadecimal string.
             return sBuilder.ToString();
